@@ -1,34 +1,27 @@
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Operator implements Runnable {
-    private final ConcurrentLinkedQueue<Call> calls;
-    private final int callProcessingTime;
+    private final ConcurrentLinkedQueue<Integer> calls;
 
-    public Operator(ConcurrentLinkedQueue<Call> calls, int callProcessingTime) {
+    public Operator(ConcurrentLinkedQueue<Integer> calls) {
         this.calls = calls;
-        this.callProcessingTime = callProcessingTime;
     }
 
     @Override
     public void run() {
         String name = Thread.currentThread().getName();
-        System.out.printf("Оператор %s приступил к обработке вызовов\n", name);
+        System.out.printf("%s приступил к обработке вызовов\n", name);
         int i = 0;
-        while (i < 2) {
-            try {
-                Thread.sleep(callProcessingTime / 2);
-            } catch (InterruptedException ignored) {
-            }
-            Call call = calls.poll();
+        while (true) {
+            Integer call = calls.poll();
             if (call != null) {
                 i = 0;
-                System.out.printf("Оператор %s обработал вызов номер %d\n", name, call.id);
-                try {
-                    Thread.sleep(callProcessingTime / 2);
-                } catch (InterruptedException ignored) {
-                }
+                System.out.printf("%s обработал вызов номер %d\n", name, call);
             } else i++;
+            try {
+                Thread.sleep(CallCenter.CALL_PROCESSING_TIME);
+            } catch (InterruptedException ignored) {
+            }
         }
-        System.out.printf("Оператор %s завершил работу\n", name);
     }
 }
